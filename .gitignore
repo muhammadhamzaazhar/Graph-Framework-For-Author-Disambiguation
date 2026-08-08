@@ -75,10 +75,6 @@ ipython_config.py
 Thumbs.db
 desktop.ini
 
-# --- Project: generated data & artifacts ---
-# Derived dataset produced by clean_dataset.py — regenerate instead of committing
-data/cleaned/
-
 # Model checkpoints, embeddings, caches
 *.pkl
 *.pickle
