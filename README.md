@@ -4,7 +4,7 @@
 [![Paper](https://img.shields.io/badge/paper-Scientometrics%202014-green.svg)](https://doi.org/10.1007/s11192-014-1289-4)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-An end-to-end Python implementation of the paper **"Author name disambiguation using a graph model with node splitting and merging based on bibliographic information"** (Dongwook Shin, Taehwan Kim, Joongmin Choi, Jungsun Kim — *Scientometrics*, 2014).
+An end-to-end Python implementation of the paper **"Author name disambiguation using a graph model with node splitting and merging based on bibliographic information"** (Dongwook Shin, Taehwan Kim, Joongmin Choi, Jungsun Kim - *Scientometrics*, 2014).
 
 This repository provides a complete framework for resolving author name ambiguity in scholarly digital libraries (DBLP/Arnetminer) using co-authorship graphs, cycle detection algorithms, tokenized LCS name similarity, and title keyword cosine similarity.
 
@@ -82,9 +82,7 @@ Author ambiguity in scholarly databases arises mainly from two core problems:
                        +-----------------------------------+
 ```
 
-The four stages are orchestrated by `GFADPipeline` (`gfad/pipeline.py`), which exposes one
-public method — `run_group(records, ambiguous_group)` — and internally delegates to
-`_resolve_namesakes`, `_resolve_heteronyms`, outlier removal, and cluster extraction.
+The four stages are orchestrated by `GFADPipeline` (`gfad/pipeline.py`), which exposes one public method - `run_group(records, ambiguous_group)` - and internally delegates to `_resolve_namesakes`, `_resolve_heteronyms`, outlier removal, and cluster extraction.
 
 ### Algorithm Summary
 
