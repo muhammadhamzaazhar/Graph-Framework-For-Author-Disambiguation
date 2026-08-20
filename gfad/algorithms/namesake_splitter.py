@@ -39,8 +39,8 @@ def split_namesakes(target_v_id: str, longest_cycles: List[Set[str]], gm: GraphM
 
         n_pub_ids = {p.paper_id for p in n_pubs}
 
-        # splitPubs <- allPubs intersect nPubs
-        split_pubs = [p for p in all_pubs if p.paper_id in n_pub_ids]
+        # splitPubs <- allPubs intersect nPubs, excluding papers already claimed by an earlier cycle
+        split_pubs = [p for p in all_pubs if p.paper_id in n_pub_ids and p.paper_id not in assigned_paper_ids]
         
         # If no intersection found (edge case), fallback to publications mentioning co-authors
         if not split_pubs:

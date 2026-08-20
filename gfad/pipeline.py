@@ -73,8 +73,13 @@ class GFADPipeline:
             "vertex_count": len(gm.vertices)
         })
 
+        # Identity vertices: those actually representing the ambiguous target author
+        # (as opposed to coauthor vertices, which also hold copies of the same
+        # publications and must not be treated as separate predicted clusters).
+        identity_ids = {v.v_id for v in gm.get_all_vertices() if v.name.lower() == ambiguous_group.lower()}
+
         # 3. Heteronymous Name Resolution (Similarity Search, Same Author Detection & Merging)
-        merge_count = self._resolve_heteronyms(gm, ambiguous_group)
+        merge_count = self._resolve_heteronyms(gm, ambiguous_group, identity_ids)
         after_heteronym_snapshot = gm.clone()
         trace["steps"].append({
             "stage": "Heteronymous Resolution",
@@ -85,6 +90,10 @@ class GFADPipeline:
         # 4. Outlier Removal (Algorithm 6)
         if self.with_outlier_removal:
             outlier_logs = remove_outliers(gm)
+            for log in outlier_logs:
+                if log["outlier_v_id"] in identity_ids:
+                    identity_ids.discard(log["outlier_v_id"])
+                    identity_ids.add(log["merged_into_v_id"])
             trace["steps"].append({
                 "stage": "Outlier Removal",
                 "description": f"Merged {len(outlier_logs)} isolated outlier vertices using title keyword cosine similarity.",
@@ -94,7 +103,7 @@ class GFADPipeline:
         after_outlier_snapshot = gm.clone()
 
         # 5. Evaluate predicted clusters against ground truth
-        predicted_clusters = self._extract_predicted_clusters(gm, ambiguous_group)
+        predicted_clusters = self._extract_predicted_clusters(gm, identity_ids)
         ground_truth_clusters = self._extract_ground_truth_clusters(group_records)
         metrics = evaluate_clusters(predicted_clusters, ground_truth_clusters)
 
@@ -138,12 +147,15 @@ class GFADPipeline:
 
         return split_count
 
-    def _resolve_heteronyms(self, gm: GraphModel, ambiguous_group: str) -> int:
+    def _resolve_heteronyms(self, gm: GraphModel, ambiguous_group: str, identity_ids: Set[str]) -> int:
         """
         Merges vertices with similar names that share co-authors
         (Algorithms 3, 4 & 5). Returns the number of vertices merged away.
+        Only searches heteronyms for vertices that represent the target author's
+        identity (identity_ids), not arbitrary coauthor vertices; identity_ids is
+        updated in place to follow the base vertex resulting from each merge.
         """
-        target_vertices = [v for v in gm.get_all_vertices() if ambiguous_group.lower() in v.name.lower()]
+        target_vertices = [v for v in gm.get_all_vertices() if v.v_id in identity_ids]
         merge_count = 0
 
         for target_v in target_vertices:
@@ -154,20 +166,22 @@ class GFADPipeline:
             if sim_vertices:
                 merging_list = detect_same_author(target_v, sim_vertices, gm)
                 if len(merging_list) > 1:
-                    merge_heteronymous_names(merging_list, gm)
+                    base_vertex = merge_heteronymous_names(merging_list, gm)
+                    for m_vertex in merging_list:
+                        identity_ids.discard(m_vertex.v_id)
+                    identity_ids.add(base_vertex.v_id)
                     merge_count += len(merging_list) - 1
 
         return merge_count
 
     @staticmethod
-    def _extract_predicted_clusters(gm: GraphModel, ambiguous_group: str) -> List[Set[str]]:
-        """Each remaining vertex holding target-group papers is one predicted author cluster."""
+    def _extract_predicted_clusters(gm: GraphModel, identity_ids: Set[str]) -> List[Set[str]]:
+        """Each surviving identity vertex (descended from the target author) is one predicted cluster."""
         clusters: List[Set[str]] = []
         for v in gm.get_all_vertices():
-            paper_ids = {
-                p.paper_id for p in v.get_pub_list()
-                if p.ambiguous_group.lower() == ambiguous_group.lower()
-            }
+            if v.v_id not in identity_ids:
+                continue
+            paper_ids = {p.paper_id for p in v.get_pub_list()}
             if paper_ids:
                 clusters.append(paper_ids)
         return clusters
