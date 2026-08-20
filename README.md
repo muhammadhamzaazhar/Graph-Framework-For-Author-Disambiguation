@@ -41,7 +41,7 @@ Author ambiguity in scholarly databases arises mainly from two core problems:
 ## Key Features
 
 - **Complete Algorithmic Fidelity**: Implements all 6 algorithms described in Shin et al. (2014).
-- **Comprehensive Metrics Engine**: Computes $K$-Metric ($\text{ACP}, \text{AAP}, K$), Pairwise-$F_1$ ($\text{PP}, \text{PR}, pF1$), and Cluster-$F_1$ ($\text{CP}, \text{CR}, cF1$).
+- **Comprehensive Metrics Engine**: Computes K-Metric (ACP, AAP, K), Pairwise-F1 (PP, PR, pF1), and Cluster-F1 (CP, CR, cF1).
 - **Ablation Modes Supported**: Run both `GFAD-AD` (without outlier removal) and `GFAD-OR` (with outlier removal).
 - **Central Configuration**: All paths, thresholds, and benchmark group definitions live in a single module (`gfad/config.py`).
 - **Zero External Dependencies**: Core GFAD algorithms and CLI are written in pure Python using only standard library modules.
@@ -232,16 +232,16 @@ All tunables live in [`gfad/config.py`](gfad/config.py):
 
 ## Benchmark Results Summary
 
-Evaluation across the 14 DBLP Benchmark Author Groups — run `python run_gfad.py --benchmark`
+Evaluation across the 14 DBLP Benchmark Author Groups - run `python run_gfad.py --benchmark`
 to reproduce; full per-group results are saved to `experiments/benchmark_results.json`.
 
 | Ambiguous Group | GFAD-AD (K, pF1, cF1) | GFAD-OR (K, pF1, cF1) |
 | :--- | :--- | :--- |
-| **A. Gupta** | K: 1.79 \| pF1: 0.75 \| cF1: 0.07 | K: 1.79 \| pF1: 0.75 \| cF1: 0.07 |
-| **J. Lee** | K: 2.05 \| pF1: 0.71 \| cF1: 0.16 | K: 2.06 \| pF1: 0.70 \| cF1: 0.16 |
-| **S. Lee** | K: 1.88 \| pF1: 0.69 \| cF1: 0.17 | K: 1.88 \| pF1: 0.69 \| cF1: 0.17 |
-| **Y. Chen** | K: 2.45 \| pF1: 0.97 \| cF1: 0.17 | K: 2.45 \| pF1: 0.97 \| cF1: 0.17 |
-| **AVERAGE (14 groups)** | **K: 1.85 \| pF1: 0.73 \| cF1: 0.15** | **K: 1.85 \| pF1: 0.73 \| cF1: 0.15** |
+| **A. Gupta** | K: 0.66 \| pF1: 0.56 \| cF1: 0.12 | K: 0.66 \| pF1: 0.56 \| cF1: 0.12 |
+| **J. Lee** | K: 0.72 \| pF1: 0.47 \| cF1: 0.25 | K: 0.72 \| pF1: 0.47 \| cF1: 0.25 |
+| **S. Lee** | K: 0.69 \| pF1: 0.50 \| cF1: 0.23 | K: 0.69 \| pF1: 0.50 \| cF1: 0.23 |
+| **Y. Chen** | K: 0.78 \| pF1: 0.64 \| cF1: 0.27 | K: 0.78 \| pF1: 0.64 \| cF1: 0.27 |
+| **AVERAGE (14 groups)** | **K: 0.68 \| pF1: 0.51 \| cF1: 0.20** | **K: 0.68 \| pF1: 0.51 \| cF1: 0.20** |
 
 ---
 
